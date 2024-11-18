@@ -3,30 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hypothesenbildung Training</title>
+    <title>Fortgeschrittener Drag & Drop Lückentext</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 20px;
             background-color: #f5f5f5;
-        }
-
-        .header-fixed {
-            position: sticky;
-            top: 0;
-            background-color: #ffffff;
-            padding: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            z-index: 1000;
-        }
-
-        .info-box {
-            background-color: #e3f2fd;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 10px;
         }
 
         .content {
@@ -38,28 +21,41 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .exercise {
-            margin-bottom: 30px;
-            padding: 15px;
-            border: 1px solid #e0e0e0;
+        .question {
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+
+        .drop-zone {
+            display: inline-block;
+            width: 150px;
+            padding: 5px;
+            margin: 5px;
+            background-color: #f0f0f0;
+            border: 2px dashed #ccc;
             border-radius: 5px;
+            text-align: center;
+            font-style: italic;
         }
 
-        .feedback {
-            margin-top: 10px;
-            padding: 10px;
+        .drag-words {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .drag-item {
+            padding: 8px 12px;
+            background-color: #4CAF50;
+            color: white;
             border-radius: 5px;
-            display: none;
+            cursor: grab;
+            font-size: 16px;
         }
 
-        .correct {
-            background-color: #dff0d8;
-            color: #3c763d;
-        }
-
-        .incorrect {
-            background-color: #f2dede;
-            color: #a94442;
+        .drag-item:active {
+            cursor: grabbing;
         }
 
         button {
@@ -76,230 +72,116 @@
             background-color: #45a049;
         }
 
-        .hint {
-            color: #666;
-            font-style: italic;
-            margin-top: 5px;
+        .feedback {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 15px;
+        .correct {
+            background-color: #dff0d8;
+            color: #3c763d;
         }
 
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f5f5f5;
-        }
-
-        textarea {
-            width: 100%;
-            padding: 8px;
-            margin: 5px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 20px;
-            background-color: #f0f0f0;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            overflow: hidden;
-        }
-
-        .progress {
-            height: 100%;
-            background-color: #4CAF50;
-            transition: width 0.3s ease;
+        .incorrect {
+            background-color: #f2dede;
+            color: #a94442;
         }
     </style>
-    <script>
-        let currentExercise = 0;
-        const totalExercises = 5;
-
-        function updateProgress() {
-            const progress = (currentExercise / totalExercises) * 100;
-            document.querySelector('.progress').style.width = progress + '%';
-        }
-
-        function checkHypothesis() {
-            const exerciseNum = currentExercise + 1;
-            const nullHyp = document.getElementById(`nullhypothesis${exerciseNum}`).value.trim().toLowerCase();
-            const altHyp = document.getElementById(`althypothesis${exerciseNum}`).value.trim().toLowerCase();
-            const feedback = document.getElementById(`feedback${exerciseNum}`);
-            
-            const solutions = hypothesisSolutions[currentExercise];
-            const nullCorrect = solutions.nullHypothesisKeywords.some(keyword => 
-                nullHyp.includes(keyword.toLowerCase()));
-            const altCorrect = solutions.altHypothesisKeywords.some(keyword => 
-                altHyp.includes(keyword.toLowerCase()));
-
-            feedback.style.display = 'block';
-            
-            if (nullCorrect && altCorrect) {
-                feedback.innerHTML = `<strong>Sehr gut!</strong><br>${solutions.explanation}`;
-                feedback.className = 'feedback correct';
-                if (currentExercise < totalExercises - 1) {
-                    currentExercise++;
-                    updateProgress();
-                    document.getElementById(`exercise${currentExercise + 1}`).style.display = 'block';
-                }
-            } else {
-                feedback.innerHTML = `<strong>Noch nicht ganz richtig.</strong><br>
-                    ${!nullCorrect ? 'Überdenke die Nullhypothese nochmal. ' + solutions.nullHint : ''}
-                    ${!altCorrect ? 'Überdenke die Alternativhypothese nochmal. ' + solutions.altHint : ''}`;
-                feedback.className = 'feedback incorrect';
-            }
-        }
-
-        const hypothesisSolutions = [
-            {
-                nullHypothesisKeywords: ["kein unterschied", "gleich", "keine differenz"],
-                altHypothesisKeywords: ["unterschied", "höher", "niedriger"],
-                explanation: "Die Nullhypothese postuliert keine Unterschiede zwischen den Gruppen, während die Alternativhypothese einen Unterschied annimmt.",
-                nullHint: "Die Nullhypothese sollte die Annahme der Gleichheit ausdrücken.",
-                altHint: "Die Alternativhypothese sollte den erwarteten Unterschied beschreiben."
-            },
-            {
-                nullHypothesisKeywords: ["kein zusammenhang", "keine korrelation", "unabhängig"],
-                altHypothesisKeywords: ["zusammenhang", "korrelation", "je mehr"],
-                explanation: "Bei Zusammenhangshypothesen postuliert die Nullhypothese keine Beziehung zwischen den Variablen, während die Alternativhypothese einen Zusammenhang beschreibt.",
-                nullHint: "Die Nullhypothese sollte die Unabhängigkeit der Variablen beschreiben.",
-                altHint: "Die Alternativhypothese sollte die erwartete Beziehung zwischen den Variablen ausdrücken."
-            },
-            {
-                nullHypothesisKeywords: ["keine veränderung", "gleich", "kein effekt"],
-                altHypothesisKeywords: ["verändert", "verbessert", "verschlechtert"],
-                explanation: "Bei Veränderungshypothesen geht die Nullhypothese von keiner Veränderung aus, während die Alternativhypothese eine Veränderung über die Zeit oder durch Intervention beschreibt.",
-                nullHint: "Die Nullhypothese sollte die Annahme keiner Veränderung ausdrücken.",
-                altHint: "Die Alternativhypothese sollte die erwartete Veränderung beschreiben."
-            },
-            {
-                nullHypothesisKeywords: ["kein einfluss", "keine auswirkung", "keine wirkung"],
-                altHypothesisKeywords: ["einfluss", "auswirkung", "wirkt sich"],
-                explanation: "Die Nullhypothese negiert einen kausalen Zusammenhang, während die Alternativhypothese einen Einfluss der unabhängigen auf die abhängige Variable postuliert.",
-                nullHint: "Die Nullhypothese sollte die Abwesenheit eines Effekts beschreiben.",
-                altHint: "Die Alternativhypothese sollte den erwarteten Einfluss spezifizieren."
-            },
-            {
-                nullHypothesisKeywords: ["nicht von", "gleich", "kein unterschied"],
-                altHypothesisKeywords: ["unterscheidet sich", "variiert", "abhängig"],
-                explanation: "Die Nullhypothese postuliert keine Gruppenunterschiede, während die Alternativhypothese Unterschiede zwischen den Gruppen annimmt.",
-                nullHint: "Die Nullhypothese sollte die Gleichheit zwischen den Gruppen ausdrücken.",
-                altHint: "Die Alternativhypothese sollte die erwarteten Gruppenunterschiede beschreiben."
-            }
-        ];
-    </script>
 </head>
 <body>
-    <div class="header-fixed">
-        <h1>Hypothesenbildung Training</h1>
-        <div class="info-box">
-            <h3>Wichtige Begriffe:</h3>
-            <table>
-                <tr>
-                    <th>Begriff</th>
-                    <th>Erklärung</th>
-                </tr>
-                <tr>
-                    <td>Nullhypothese (H₀)</td>
-                    <td>Postuliert keinen Effekt/Unterschied/Zusammenhang. Sie wird standardmäßig angenommen und durch statistische Tests überprüft.</td>
-                </tr>
-                <tr>
-                    <td>Alternativhypothese (H₁)</td>
-                    <td>Postuliert einen Effekt/Unterschied/Zusammenhang. Sie ist die Forschungshypothese, die man zu bestätigen versucht.</td>
-                </tr>
-                <tr>
-                    <td>Gerichtete Hypothese</td>
-                    <td>Macht eine Aussage über die Richtung des Effekts (größer/kleiner, besser/schlechter).</td>
-                </tr>
-                <tr>
-                    <td>Ungerichtete Hypothese</td>
-                    <td>Postuliert nur, dass es einen Unterschied gibt, ohne die Richtung zu spezifizieren.</td>
-                </tr>
-            </table>
+    <div class="content">
+        <h1>Fortgeschrittener Drag & Drop Lückentext</h1>
+        <p>Ziehe die Begriffe in die passenden Lücken, um die Hypothesen korrekt zu vervollständigen.</p>
+
+        <!-- Komplexer Text mit 15 Lücken -->
+        <div class="question">
+            <p>1. Ein <span class="drop-zone" data-correct="Wissenschaftler"></span> möchte herausfinden, ob die <span class="drop-zone" data-correct="Schlafqualität"></span> die <span class="drop-zone" data-correct="Gedächtnisleistung"></span> beeinflusst.</p>
+            <p>2. Die Nullhypothese (H₀) besagt, dass es keinen <span class="drop-zone" data-correct="Zusammenhang"></span> zwischen diesen beiden <span class="drop-zone" data-correct="Faktoren"></span> gibt.</p>
+            <p>3. Die Alternativhypothese (H₁) formuliert, dass eine <span class="drop-zone" data-correct="bessere"></span> Schlafqualität zu einer <span class="drop-zone" data-correct="höheren"></span> Gedächtnisleistung führt.</p>
+            <p>4. In einer zweiten Studie wird untersucht, ob eine <span class="drop-zone" data-correct="Therapie"></span> gegen <span class="drop-zone" data-correct="Stress"></span> das Wohlbefinden verbessert.</p>
+            <p>5. Die Nullhypothese besagt, dass die Therapie <span class="drop-zone" data-correct="keine"></span> messbaren Auswirkungen hat.</p>
+            <p>6. Die Alternativhypothese postuliert, dass die <span class="drop-zone" data-correct="Lebensqualität"></span> durch die Therapie <span class="drop-zone" data-correct="signifikant"></span> verbessert wird.</p>
+            <p>7. Eine dritte Untersuchung befasst sich mit den <span class="drop-zone" data-correct="Unterschieden"></span> in der Problemlösungskompetenz von <span class="drop-zone" data-correct="Teams"></span> mit und ohne Führungsperson.</p>
+            <p>8. Die Nullhypothese lautet: Die Problemlösungskompetenz ist <span class="drop-zone" data-correct="unabhängig"></span> von einer Führungsperson.</p>
+            <p>9. Die Alternativhypothese postuliert, dass Teams mit Führungsperson <span class="drop-zone" data-correct="effizienter"></span> arbeiten.</p>
         </div>
-        <div class="progress-bar">
-            <div class="progress" style="width: 0%"></div>
-        </div>
+
+ <!-- Drag-Words -->
+ <div class="drag-words">
+    <div class="drag-item" draggable="true">Zusammenhang</div>
+    <div class="drag-item" draggable="true">bessere</div>
+    <div class="drag-item" draggable="true">Faktoren</div>
+    <div class="drag-item" draggable="true">Lebensqualität</div>
+    <div class="drag-item" draggable="true">keine</div>
+    <div class="drag-item" draggable="true">Wissenschaftler</div>
+    <div class="drag-item" draggable="true">Teams</div>
+    <div class="drag-item" draggable="true">höheren</div>
+    <div class="drag-item" draggable="true">Therapie</div>
+    <div class="drag-item" draggable="true">Stress</div>
+    <div class="drag-item" draggable="true">signifikant</div>
+    <div class="drag-item" draggable="true">unabhängig</div>
+    <div class="drag-item" draggable="true">Unterschieden</div>
+    <div class="drag-item" draggable="true">Gedächtnisleistung</div>
+    <div class="drag-item" draggable="true">effizienter</div>
+    <div class="drag-item" draggable="true">Schlafqualität</div>
+</div>
+
+        <!-- Überprüfen-Button -->
+        <button onclick="checkAnswers()">Überprüfen</button>
+
+        <!-- Feedback -->
+        <div id="feedback" class="feedback"></div>
     </div>
 
-    <div class="content">
-        <div id="exercise1" class="exercise">
-            <h3>Übung 1: Unterschiedshypothese</h3>
-            <p>Ein Forscher untersucht, ob Studierende in Präsenzvorlesungen bessere Noten erzielen als Studierende in Online-Vorlesungen.</p>
-            <div>
-                <label>Formuliere die Nullhypothese (H₀):</label>
-                <textarea id="nullhypothesis1" rows="2" placeholder="Es besteht kein Unterschied zwischen..."></textarea>
-                <div class="hint">Tipp: Die Nullhypothese geht von keinem Unterschied aus.</div>
-            </div>
-            <div>
-                <label>Formuliere die Alternativhypothese (H₁):</label>
-                <textarea id="althypothesis1" rows="2" placeholder="Studierende in Präsenzvorlesungen..."></textarea>
-                <div class="hint">Tipp: Die Alternativhypothese beschreibt den erwarteten Unterschied.</div>
-            </div>
-            <button onclick="checkHypothesis()">Überprüfen</button>
-            <div id="feedback1" class="feedback"></div>
-        </div>
+    <script>
+        const dragItems = document.querySelectorAll('.drag-item');
+        const dropZones = document.querySelectorAll('.drop-zone');
+        let draggedItem = null;
 
-        <div id="exercise2" class="exercise" style="display: none;">
-            <h3>Übung 2: Zusammenhangshypothese</h3>
-            <p>Eine Studie untersucht den Zusammenhang zwischen Lernzeit und Prüfungsergebnissen.</p>
-            <div>
-                <label>Formuliere die Nullhypothese (H₀):</label>
-                <textarea id="nullhypothesis2" rows="2" placeholder="Es besteht kein Zusammenhang zwischen..."></textarea>
-                <div class="hint">Tipp: Die Nullhypothese negiert einen Zusammenhang.</div>
-            </div>
-            <div>
-                <label>Formuliere die Alternativhypothese (H₁):</label>
-                <textarea id="althypothesis2" rows="2" placeholder="Je mehr Zeit zum Lernen aufgewendet wird..."></textarea>
-                <div class="hint">Tipp: Die Alternativhypothese beschreibt die erwartete Beziehung.</div>
-            </div>
-            <button onclick="checkHypothesis()">Überprüfen</button>
-            <div id="feedback2" class="feedback"></div>
-        </div>
+        dragItems.forEach(item => {
+            item.addEventListener('dragstart', () => {
+                draggedItem = item;
+            });
 
-        <div id="exercise3" class="exercise" style="display: none;">
-            <h3>Übung 3: Veränderungshypothese</h3>
-            <p>Ein Experiment untersucht die Wirkung eines achtwöchigen Meditationsprogramms auf das Stresslevel.</p>
-            <div>
-                <label>Formuliere die Nullhypothese (H₀):</label>
-                <textarea id="nullhypothesis3" rows="2" placeholder="Das Meditationsprogramm hat keinen Effekt..."></textarea>
-                <div class="hint">Tipp: Die Nullhypothese geht von keiner Veränderung aus.</div>
-            </div>
-            <div>
-                <label>Formuliere die Alternativhypothese (H₁):</label>
-                <textarea id="althypothesis3" rows="2" placeholder="Nach dem Meditationsprogramm..."></textarea>
-                <div class="hint">Tipp: Die Alternativhypothese beschreibt die erwartete Veränderung.</div>
-            </div>
-            <button onclick="checkHypothesis()">Überprüfen</button>
-            <div id="feedback3" class="feedback"></div>
-        </div>
+            item.addEventListener('dragend', () => {
+                draggedItem = null;
+            });
+        });
 
-        <div id="exercise4" class="exercise" style="display: none;">
-            <h3>Übung 4: Kausalhypothese</h3>
-            <p>Eine Untersuchung erforscht, ob die Raumtemperatur die Konzentrationsleistung beeinflusst.</p>
-            <div>
-                <label>Formuliere die Nullhypothese (H₀):</label>
-                <textarea id="nullhypothesis4" rows="2" placeholder="Die Raumtemperatur hat keinen Einfluss..."></textarea>
-                <div class="hint">Tipp: Die Nullhypothese negiert einen kausalen Zusammenhang.</div>
-            </div>
-            <div>
-                <label>Formuliere die Alternativhypothese (H₁):</label>
-                <textarea id="althypothesis4" rows="2" placeholder="Die Raumtemperatur beeinflusst..."></textarea>
-                <div class="hint">Tipp: Die Alternativhypothese beschreibt den erwarteten Einfluss.</div>
-            </div>
-            <button onclick="checkHypothesis()">Überprüfen</button>
-            <div id="feedback4" class="feedback"></div>
-        </div>
+        dropZones.forEach(zone => {
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+            });
 
-        <div id="exercise5"
+            zone.addEventListener('drop', () => {
+                if (!zone.textContent) {
+                    zone.textContent = draggedItem.textContent;
+                    draggedItem.style.display = 'none';
+                }
+            });
+        });
+
+        function checkAnswers() {
+            let correct = true;
+            dropZones.forEach(zone => {
+                const correctAnswer = zone.getAttribute('data-correct');
+                if (zone.textContent.trim() !== correctAnswer) {
+                    correct = false;
+                    zone.style.borderColor = '#a94442';
+                } else {
+                    zone.style.borderColor = '#3c763d';
+                }
+            });
+
+            const feedback = document.getElementById('feedback');
+            feedback.style.display = 'block';
+            feedback.textContent = correct
+                ? 'Sehr gut! Alle Antworten sind korrekt.'
+                : 'Einige Antworten sind noch nicht korrekt. Versuche es erneut!';
+            feedback.className = correct ? 'feedback correct' : 'feedback incorrect';
+        }
+    </script>
+</body>
+</html>
