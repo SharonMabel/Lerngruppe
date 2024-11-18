@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interaktiver Lerngruppen-Test: Hypothesenbildung und AV/UV</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        .question-container {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+        }
+        .hidden {
+            display: none;
+        }
+        .answer {
+            color: #27ae60;
+            font-weight: bold;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f0f9f0;
+            border-radius: 5px;
+        }
+        .wrong {
+            color: #c0392b;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #fdf0f0;
+            border-radius: 5px;
+        }
+        button {
+            margin: 20px 0;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .feedback {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .input-group {
+            margin: 10px 0;
+        }
+        .input-group label {
+            display: block;
+            margin: 5px 0;
+        }
+        textarea {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+    <script>
+        function checkHypotheses() {
+            const correctAnswers = {
+                1: "B",
+                2: "A",
+                3: "C",
+                4: "B",
+                5: "A",
+                6: "C"
+            };
+            let score = 0;
+            for (let i = 1; i <= 6; i++) {
+                const selected = document.querySelector(`input[name="question${i}"]:checked`);
+                const result = document.getElementById(`result${i}`);
+                result.classList.remove('hidden');
+                
+                if (selected) {
+                    if (selected.value === correctAnswers[i]) {
+                        result.textContent = "Richtig! ";
+                        result.className = "answer";
+                        score++;
+                    } else {
+                        result.textContent = "Falsch! ";
+                        result.className = "wrong";
+                    }
+                    
+                    switch(correctAnswers[i]) {
+                        case "A":
+                            result.textContent += "Dies ist eine Zusammenhangshypothese, da ein korrelativer Zusammenhang zwischen zwei Variablen beschrieben wird.";
+                            break;
+                        case "B":
+                            result.textContent += "Dies ist eine Unterschiedshypothese, da Unterschiede zwischen Gruppen oder Bedingungen verglichen werden.";
+                            break;
+                        case "C":
+                            result.textContent += "Dies ist eine Veränderungshypothese, da eine Veränderung über die Zeit oder durch eine Intervention beschrieben wird.";
+                            break;
+                    }
+                }
+            }
+            document.getElementById('scoreDisplay').textContent = `Gesamtpunktzahl: ${score} von 6 Punkten`;
+        }
+
+        function checkVariables() {
+            const correctAnswers = {
+                1: {
+                    uv: ["kaffeekonsum", "kaffee"],
+                    av: ["schlafdauer", "schlaf"]
+                },
+                2: {
+                    uv: ["meditation", "meditationsdauer", "meditationszeit"],
+                    av: ["konzentration", "konzentrationsfähigkeit"]
+                },
+                3: {
+                    uv: ["lernmethode", "lernstrategie"],
+                    av: ["lernerfolg", "leistung", "prüfungsergebnis", "prüfungsergebnisse", "note", "noten"]
+                }
+            };
+
+            for (let i = 1; i <= 3; i++) {
+                const uvInput = document.getElementById(`uv${i}`).value.toLowerCase().trim();
+                const avInput = document.getElementById(`av${i}`).value.toLowerCase().trim();
+                const result = document.getElementById(`varResult${i}`);
+                
+                const uvCorrect = correctAnswers[i].uv.includes(uvInput);
+                const avCorrect = correctAnswers[i].av.includes(avInput);
+                
+                if (uvCorrect && avCorrect) {
+                    result.textContent = "Richtig! Beide Variablen wurden korrekt identifiziert.";
+                    result.className = "answer";
+                } else if (!uvCorrect && !avCorrect) {
+                    result.textContent = "Beide Variablen sind nicht korrekt. UV sollte eine der folgenden sein: " + 
+                        correctAnswers[i].uv.join(", ") + ". AV sollte eine der folgenden sein: " + 
+                        correctAnswers[i].av.join(", ");
+                    result.className = "wrong";
+                } else {
+                    result.textContent = uvCorrect ? 
+                        "Die UV ist richtig, aber die AV sollte eine der folgenden sein: " + correctAnswers[i].av.join(", ") :
+                        "Die AV ist richtig, aber die UV sollte eine der folgenden sein: " + correctAnswers[i].uv.join(", ");
+                    result.className = "wrong";
+                }
+                result.classList.remove('hidden');
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Interaktiver Lerngruppen-Test: Hypothesenbildung und AV/UV</h1>
+    
+    <h2>Teil 1: Hypothesenarten</h2>
+    <p>Ordne die Aussagen den richtigen Hypothesenarten zu:</p>
+    
+    <div class="question-container">
+        <div>
+            <p>1. „Studierende in Präsenzvorlesungen erreichen bessere Noten als Studierende in Online-Vorlesungen."</p>
+            <label><input type="radio" name="question1" value="A"> A) Zusammenhangshypothese</label><br>
+            <label><input type="radio" name="question1" value="B"> B) Unterschiedshypothese</label><br>
+            <label><input type="radio" name="question1" value="C"> C) Veränderungshypothese</label><br>
+            <div id="result1" class="hidden"></div>
+        </div>
+    </div>
+
+    <div class="question-container">
+        <div>
+            <p>2. „Je höher die Motivation, desto besser die sportliche Leistung."</p>
+            <label><input type="radio" name="question2" value="A"> A) Zusammenhangshypothese</label><br>
+            <label><input type="radio" name="question2" value="B"> B) Unterschiedshypothese</label><br>
+            <label><input type="radio" name="question2" value="C"> C) Veränderungshypothese</label><br>
+            <div id="result2" class="hidden"></div>
+        </div>
+    </div>
+
+    <div class="question-container">
+        <div>
+            <p>3. „Durch das Training verbessert sich die Reaktionszeit der Teilnehmer."</p>
+            <label><input type="radio" name="question3" value="A"> A) Zusammenhangshypothese</label><br>
+            <label><input type="radio" name="question3" value="B"> B) Unterschiedshypothese</label><br>
+            <label><input type="radio" name="question3" value="C"> C) Veränderungshypothese</label><br>
+            <div id="result3" class="hidden"></div>
+        </div>
+    </div>
+
+    <div class="question-container">
+        <div>
+            <p>4. „Extrovertierte Menschen haben ein größeres soziales Netzwerk als introvertierte Menschen."</p>
+            <label><input type="radio" name="question4" value="A"> A) Zusammenhangshypothese</label><br>
+            <label><input type="radio" name="question4" value="B"> B) Unterschiedshypothese</label><br>
+            <label><input type="radio" name="question4" value="C"> C) Veränderungshypothese</label><br>
+            <div id="result4" class="hidden"></div>
+        </div>
+    </div>
+
+    <div class="question-container">
+        <div>
+            <p>5. „Je mehr Zeit mit Social Media verbracht wird, desto geringer ist die Konzentrationsfähigkeit."</p>
+            <label><input type="radio" name="question5" value="A"> A) Zusammenhangshypothese</label><br>
+            <label><input type="radio" name="question5" value="B"> B) Unterschiedshypothese</label><br>
+            <label><input type="radio" name="question5" value="C"> C) Veränderungshypothese</label><br>
+            <div id="result5" class="hidden"></div>
+        </div>
+    </div>
+
+    <div class="question-container">
+        <div>
+            <p>6. „Nach sechswöchigem Ausdauertraining verbessert sich die Herzfrequenzvariabilität."</p>
+            <label><input type="radio" name="question6" value="A"> A) Zusammenhangshypothese</label><br>
+            <label><input type="radio" name="question6" value="B"> B) Unterschiedshypothese</label><br>
+            <label><input type="radio" name="question6" value="C"> C) Veränderungshypothese</label><br>
+            <div id="result6" class="hidden"></div>
+        </div>
+    </div>
+
+    <button onclick="checkHypotheses()">Hypothesen überprüfen</button>
+    <div id="scoreDisplay" class="feedback"></div>
+
+    <h2>Teil 2: AV/UV identifizieren</h2>
+    <p>Identifiziere die unabhängige (UV) und abhängige Variable (AV) in den folgenden Beispielen:</p>
+    
+    <div class="question-container">
+        <p>1. Ein Forscher untersucht, wie der Kaffeekonsum die Schlafdauer beeinflusst.</p>
+        <div class="input-group">
+            <label>Unabhängige Variable (UV):</label>
+            <input type="text" id="uv1" placeholder="UV hier eingeben...">
+            <label>Abhängige Variable (AV):</label>
+            <input type="text" id="av1" placeholder="AV hier eingeben...">
+        </div>
+        <div id="varResult1" class="hidden"></div>
+    </div>
+
+    <div class="question-container">
+        <p>2. Eine Studie untersucht, wie sich die tägliche Meditationsdauer auf die Konzentrationsfähigkeit auswirkt.</p>
+        <div class="input-group">
+            <label>Unabhängige Variable (UV):</label>
+            <input type="text" id="uv2" placeholder="UV hier eingeben...">
+            <label>Abhängige Variable (AV):</label>
+            <input type="text" id="av2" placeholder="AV hier eingeben...">
+        </div>
+        <div id="varResult2" class="hidden"></div>
+    </div>
+
+    <div class="question-container">
+        <p>3. Es wird untersucht, ob verschiedene Lernmethoden zu unterschiedlichen Prüfungsergebnissen führen.</p>
+        <div class="input-group">
+            <label>Unabhängige Variable (UV):</label>
+            <input type="text" id="uv3" placeholder="UV hier eingeben...">
+            <label>Abhängige Variable (AV):</label>
+            <input type="text" id="av3" placeholder="AV hier eingeben...">
+        </div>
+        <div id="varResult3" class="hidden"></div>
+    </div>
+
+    <button onclick="checkVariables()">Variablen überprüfen</button>
+</body>
+</html>
